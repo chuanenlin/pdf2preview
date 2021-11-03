@@ -51,7 +51,7 @@ def stack(images, mode):
         new_im = images[-1]
     return new_im
 
-st.set_page_config(page_title="pdf2snapshot", page_icon="📄", layout="centered", initial_sidebar_state="collapsed", menu_items=None)
+st.set_page_config(page_title="pdf2preview", page_icon="📄", layout="centered", initial_sidebar_state="collapsed", menu_items=None)
 hide_streamlit_style = """
 	<style>
 	MainMenu {visibility: hidden;}
@@ -64,7 +64,7 @@ hide_streamlit_style = """
 	</style>
 	"""
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-st.title("PDF ➡️ Snapshot")
+st.title("PDF ➡️ Preview")
 
 col1, col2 = st.columns([1, 6])
 with col1:
@@ -93,4 +93,4 @@ if st.session_state.file is not None:
         output = io.BytesIO()
         preview.save(output, format="PNG")
         output = output.getvalue()
-        download = st.download_button(label="Download image", data=output, file_name="pdf2snapshot.png", mime="image/png")
+        download = st.download_button(label="Download image", data=output, file_name="pdf2preview.png", mime="image/png")
