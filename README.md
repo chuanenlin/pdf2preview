@@ -8,7 +8,7 @@ A simple tool to save me time on Illustrator. Generates a preview image for a PD
 
 ## Try It Out! 🌐
 
-[https://p2p.chuanenlin.com](https://p2p.chuanenlin.com)
+[http://p2p.chuanenlin.com](http://p2p.chuanenlin.com)
 
 ---
 
