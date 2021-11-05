@@ -6,13 +6,13 @@ A simple tool to save me time on Illustrator. Generates a preview image for a PD
 
 ---
 
-## Try It Out! 🌐
+## Try it out!
 
-[http://p2p.chuanenlin.com](http://p2p.chuanenlin.com)
+http://pdf2preview.chuanenlin.com
 
 ---
 
-## Getting Started
+## Setting up
 
 1.  Clone the repository.
 

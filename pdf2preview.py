@@ -56,17 +56,20 @@ hide_streamlit_style = """
 	<style>
 	MainMenu {visibility: hidden;}
 	footer {visibility: hidden;}
-	* {font-family: Avenir; text-align: center;}
+	* {font-family: Avenir;}
+    h1 {text-align: center;}
 	.css-gma2qf {display: flex; justify-content: center; font-size: 36px; font-weight: bold;}
 	a:link {text-decoration: none;}
 	a:hover {text-decoration: none;}
 	.st-ba {font-family: Avenir;}
+    .st-button {text-align: center;}
 	</style>
 	"""
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 st.title("PDF ➡️ Preview")
+st.markdown("Generate a preview image for your PDF file.")
 
-col1, col2 = st.columns([1, 6])
+col1, col2 = st.columns([1, 5])
 with col1:
     st.radio("Pick a layout", ("Unroll", "Stack", "Cover"), key="mode")
 with col2:
@@ -93,4 +96,8 @@ if st.session_state.file is not None:
         output = io.BytesIO()
         preview.save(output, format="PNG")
         output = output.getvalue()
-        download = st.download_button(label="Download image", data=output, file_name="pdf2preview.png", mime="image/png")
+        b1, b2, b3 = st.columns([1, 1, 1])
+        with b2:
+            download = st.download_button(label="Download image", data=output, file_name="pdf2preview.png", mime="image/png")
+
+st.markdown("By [David Chuan-En Lin](https://chuanenlin.com). Play with the code at https://github.com/chuanenlin/pdf2preview.")
