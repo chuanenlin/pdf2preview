@@ -2,6 +2,7 @@ import streamlit as st
 from PIL import Image, ImageFilter, ImageOps
 import sys
 import io
+from utils import download_file, remove_file
 import fitz #pip install PyMuPDF
 
 def add_border(image, border):
@@ -75,13 +76,26 @@ with col1:
 with col2:
     st.image("example.png")
 st.file_uploader("Upload your PDF", type="pdf", key="file")
+st.write("or")
+url = st.text_input("Submit link to PDF")
 
-if st.session_state.file is not None:
+
+if st.button('Generate preview'):
     with st.spinner("Processing..."):
-        file = fitz.open("pdf", st.session_state.file.read())
+        if st.session_state.file is not None:
+            file = fitz.open("pdf", st.session_state.file.read())
+        else:
+            try:
+                filename = download_file(url)
+                file = fitz.open(filename)
+            except:
+                e = ValueError('Could not download pdf file from URL')
+                st.error('Please enter a valid pdf URL', icon="🚨")
+                raise e
+
         zoom = 2
         mat = fitz.Matrix(zoom, zoom)
-        num_pages = file.pageCount
+        num_pages = file.page_count
         imgs = []
         for page_num in range(num_pages):
             page = file.load_page(page_num)
@@ -99,5 +113,6 @@ if st.session_state.file is not None:
         b1, b2, b3 = st.columns([1, 1, 1])
         with b2:
             download = st.download_button(label="Download image", data=output, file_name="pdf2preview.png", mime="image/png")
-
+        if st.session_state.file is None:
+            remove_file(filename)
 st.markdown("By [David Chuan-En Lin](https://chuanenlin.com). Play with the code at https://github.com/chuanenlin/pdf2preview.")
