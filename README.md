@@ -8,7 +8,7 @@ A simple tool to save me time on Illustrator. Generates a preview image for a PD
 
 ## Try it out
 
-[http://pdf2preview.chuanenlin.com](https://huggingface.co/spaces/chuanenlin/pdf2preview)
+https://pdf2preview.streamlit.app
 
 ---
 
