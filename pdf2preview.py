@@ -100,7 +100,7 @@ if st.button('Generate preview'):
         for page_num in range(num_pages):
             page = file.load_page(page_num)
             pix = page.get_pixmap(matrix = mat)
-            data = pix.tobytes("format")
+            data = pix.tobytes("png")
             img = Image.open(io.BytesIO(data))
             img_with_border = add_border(img, border=1)
             img_with_shadow = add_shadow(img_with_border, offset=(0,0), shadow=(0,0,0,255), border=20)
@@ -115,4 +115,4 @@ if st.button('Generate preview'):
             download = st.download_button(label="Download image", data=output, file_name="pdf2preview.png", mime="image/png")
         if st.session_state.file is None:
             remove_file(filename)
-st.markdown("By [David Chuan-En Lin](https://chuanenlin.com). Play with the code at https://github.com/chuanenlin/pdf2preview.")
+st.markdown("By [David Chuan-En Lin](https://chuanenlin.com). PDF URL support by [Eliott Zemour](https://github.com/EliottZemour). Play with the code at https://github.com/chuanenlin/pdf2preview.")
