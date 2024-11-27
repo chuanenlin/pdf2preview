@@ -1,3 +1,4 @@
 Pillow
 PyMuPDF
 streamlit
+altair<5
