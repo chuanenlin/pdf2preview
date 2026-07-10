@@ -1,130 +1,172 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+/* Self-hosted Roboto trio, neal.fun-style: the default-weight face maps to
+   Roboto MEDIUM so body text is slightly chunkier than normal. */
+@font-face {
+  font-family: Roboto;
+  src: url("/fonts/roboto-medium.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: Roboto;
+  font-weight: 700;
+  src: url("/fonts/roboto-bold.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: RobotoLight;
+  src: url("/fonts/roboto-light.woff2") format("woff2");
+  font-display: swap;
 }
 
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+body {
+  background: rgb(241, 242, 246);
+  color: rgb(51, 51, 51);
+  font-family: Roboto, sans-serif, system-ui, -apple-system, "Segoe UI",
+    Ubuntu, Cantarell, "Noto Sans";
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+.font-light {
+  font-family: RobotoLight, sans-serif, system-ui, -apple-system, "Segoe UI",
+    Ubuntu, Cantarell, "Noto Sans";
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
+/* White content card on the gray page */
+.card {
+  background: rgb(255, 255, 255);
+  border-radius: 10px;
+}
+
+/* The house hover lift: tiny, fast, guarded for touch */
+.lift {
+  transition: transform 0.07s linear, box-shadow 0.07s linear;
+  will-change: transform;
+}
+@media (hover: hover) {
+  .lift:hover {
+    box-shadow: rgba(0, 0, 0, 0.11) 3px 6px 6px 0px;
+    transform: scale(1.023);
   }
-  body {
-    @apply bg-background text-foreground;
+}
+.lift:active {
+  box-shadow: rgba(0, 0, 0, 0.15) 3px 6px 6px 0px;
+  transform: scale(1.011);
+}
+
+/* Green primary action (the reward button) */
+.btn-green {
+  background: linear-gradient(rgb(46, 204, 113), rgb(26, 188, 156));
+  border: none;
+  border-radius: 3px;
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 700;
+  padding: 12px 15px;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+/* Cream house button (secondary actions) */
+.btn-cream {
+  background: rgb(255, 245, 217);
+  border: 1px solid rgb(0, 0, 0);
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: RobotoLight, sans-serif;
+  font-size: 17px;
+  padding: 7px 12px;
+  transition: transform 0.075s ease-in-out;
+}
+@media (hover: hover) {
+  .btn-cream:hover {
+    transform: scale(1.03);
   }
-  html {
-    @apply font-sans;
+}
+
+.btn-green:disabled,
+.btn-cream:disabled {
+  background: rgb(241, 242, 246) !important;
+  border-color: rgb(178, 190, 195);
+  color: rgb(51, 51, 51);
+  cursor: auto;
+  transform: none !important;
+}
+
+.neal-input {
+  background: rgb(255, 255, 255);
+  border: 1px solid rgb(178, 190, 195);
+  border-radius: 3px;
+  color: rgb(51, 51, 51);
+  font-size: 16px;
+  padding: 9px 12px;
+  transition: border-color 0.15s;
+}
+.neal-input:focus {
+  border-color: rgb(51, 51, 51);
+  outline: none;
+}
+
+/* Layout option cards: selected gets the accent, transparent border
+   otherwise so nothing shifts */
+.option-card {
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+.option-card[aria-checked="true"] {
+  border-color: rgb(5, 196, 107);
+}
+
+/* Little page glyphs inside the layout diagrams */
+.mini-page {
+  background: rgb(255, 255, 255);
+  border: 1px solid rgb(51, 51, 51);
+  border-radius: 2px;
+  box-shadow: rgba(0, 0, 0, 0.18) 1px 2px 2px 0px;
+  height: 34px;
+  width: 26px;
+}
+
+/* Dropzone: dashed inner border, page emoji tilts on dragover */
+.dropzone {
+  border: 2px dashed rgb(178, 190, 195);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.dropzone.dragging,
+.dropzone:focus-visible {
+  border-color: rgb(5, 196, 107);
+  outline: none;
+}
+.dropzone .page-emoji {
+  display: inline-block;
+  transition: transform 0.15s ease-in-out;
+}
+.dropzone.dragging .page-emoji {
+  transform: rotate(-8deg) scale(1.15);
+}
+
+/* Easter egg: click the title arrow and it unrolls to the right */
+.title-arrow {
+  cursor: pointer;
+  display: inline-block;
+  user-select: none;
+}
+.title-arrow.rolling {
+  animation: unroll-arrow 0.55s ease-in-out;
+}
+@keyframes unroll-arrow {
+  35% {
+    transform: translateX(14px);
   }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.note-error {
+  color: rgb(245, 59, 87);
 }

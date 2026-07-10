@@ -1,21 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "pdf2preview",
+  metadataBase: new URL("https://pdf2preview.vercel.app"),
+  title: "PDF ➡️ Preview",
   description:
-    "Generate a preview image for your PDF file — perfect for sneak peeks of academic papers on project websites and slides.",
+    "Turn any PDF into a pretty preview image — perfect for sneak peeks of papers on project websites and slides.",
+  openGraph: {
+    title: "PDF ➡️ Preview",
+    description: "Turn any PDF into a pretty preview image.",
+    images: ["/share-card.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PDF ➡️ Preview",
+    description: "Turn any PDF into a pretty preview image.",
+    images: ["/share-card.png"],
+  },
 };
 
 export default function RootLayout({
@@ -24,11 +25,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en">
+      <body>{children}</body>
     </html>
   );
 }

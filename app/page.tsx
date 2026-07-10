@@ -1,21 +1,45 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Toaster } from "@/components/ui/sonner";
-import { toast } from "sonner";
 import { renderPdfPages, MAX_PAGES } from "@/lib/pdf";
 import { compose, type LayoutMode } from "@/lib/compose";
 
-const MODES: { value: LayoutMode; label: string; hint: string }[] = [
-  { value: "unroll", label: "Unroll", hint: "pages fan out side by side" },
-  { value: "stack", label: "Stack", hint: "diagonal cascade" },
-  { value: "cover", label: "Cover", hint: "first page only" },
+const MODES: { value: LayoutMode; label: string }[] = [
+  { value: "unroll", label: "Unroll" },
+  { value: "stack", label: "Stack" },
+  { value: "cover", label: "Cover" },
 ];
+
+// Tiny self-explanatory diagram of each layout, drawn with page glyphs.
+function LayoutDiagram({ mode }: { mode: LayoutMode }) {
+  if (mode === "unroll") {
+    return (
+      <div className="flex justify-center">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="mini-page first:ml-0 -ml-3" />
+        ))}
+      </div>
+    );
+  }
+  if (mode === "stack") {
+    return (
+      <div className="relative mx-auto h-[42px] w-[34px]">
+        {[2, 1, 0].map((i) => (
+          <div
+            key={i}
+            className="mini-page absolute"
+            style={{ left: i * 4, bottom: i * 4 }}
+          />
+        ))}
+      </div>
+    );
+  }
+  return (
+    <div className="flex justify-center">
+      <div className="mini-page" />
+    </div>
+  );
+}
 
 export default function Home() {
   const [mode, setMode] = useState<LayoutMode>("unroll");
@@ -23,7 +47,10 @@ export default function Home() {
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [arrowRolling, setArrowRolling] = useState(false);
   const pagesRef = useRef<HTMLCanvasElement[] | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -40,23 +67,25 @@ export default function Home() {
         });
       }, "image/png");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to compose preview");
+      setError(err instanceof Error ? err.message : "Failed to compose preview");
     }
   }, []);
 
   const loadPdf = useCallback(
     async (data: ArrayBuffer, name: string) => {
       setBusy(true);
+      setError(null);
+      setNote(null);
       try {
         const { pages, totalPageCount } = await renderPdfPages(data);
         pagesRef.current = pages;
         setFileName(name);
         if (totalPageCount > MAX_PAGES) {
-          toast.info(`Using the first ${MAX_PAGES} of ${totalPageCount} pages`);
+          setNote(`Using the first ${MAX_PAGES} of ${totalPageCount} pages`);
         }
         regenerate(mode);
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Could not read PDF");
+        setError(err instanceof Error ? err.message : "Could not read PDF");
       } finally {
         setBusy(false);
       }
@@ -67,7 +96,7 @@ export default function Home() {
   const handleFile = useCallback(
     async (file: File) => {
       if (!file.name.toLowerCase().endsWith(".pdf")) {
-        toast.error("Please choose a PDF file");
+        setError("That doesn't look like a PDF");
         return;
       }
       await loadPdf(await file.arrayBuffer(), file.name);
@@ -78,6 +107,7 @@ export default function Home() {
   const handleUrl = useCallback(async () => {
     if (!url.trim()) return;
     setBusy(true);
+    setError(null);
     try {
       const res = await fetch(`/api/fetch-pdf?url=${encodeURIComponent(url.trim())}`);
       if (!res.ok) {
@@ -86,15 +116,14 @@ export default function Home() {
       }
       await loadPdf(await res.arrayBuffer(), url.trim());
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not fetch PDF");
+      setError(err instanceof Error ? err.message : "Could not fetch PDF");
       setBusy(false);
     }
   }, [url, loadPdf]);
 
-  const selectMode = (value: string) => {
-    const next = value as LayoutMode;
-    setMode(next);
-    regenerate(next);
+  const selectMode = (value: LayoutMode) => {
+    setMode(value);
+    regenerate(value);
   };
 
   useEffect(() => {
@@ -104,129 +133,137 @@ export default function Home() {
   }, [previewUrl]);
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-16">
-      <header className="text-center">
-        <h1 className="text-4xl font-semibold tracking-tight">
-          PDF <span aria-hidden>➡️</span> Preview
-        </h1>
-        <p className="mt-3 text-muted-foreground">
-          Generate a preview image for your PDF — entirely in your browser.
-        </p>
-      </header>
-
-      <Card>
-        <CardContent className="flex flex-col gap-6 pt-6">
-          <div className="flex flex-col gap-3">
-            <Label>Layout</Label>
-            <RadioGroup
-              value={mode}
-              onValueChange={selectMode}
-              className="grid grid-cols-3 gap-3"
-            >
-              {MODES.map((m) => (
-                <Label
-                  key={m.value}
-                  htmlFor={m.value}
-                  className="flex cursor-pointer flex-col items-start gap-1 rounded-lg border p-3 transition-colors hover:bg-accent has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-accent"
-                >
-                  <span className="flex items-center gap-2">
-                    <RadioGroupItem value={m.value} id={m.value} />
-                    <span className="font-medium">{m.label}</span>
-                  </span>
-                  <span className="text-xs font-normal text-muted-foreground">
-                    {m.hint}
-                  </span>
-                </Label>
-              ))}
-            </RadioGroup>
-          </div>
-
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => fileInputRef.current?.click()}
-            onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
-            onDragOver={(e) => {
-              e.preventDefault();
-              setDragging(true);
-            }}
-            onDragLeave={() => setDragging(false)}
-            onDrop={(e) => {
-              e.preventDefault();
-              setDragging(false);
-              const file = e.dataTransfer.files[0];
-              if (file) handleFile(file);
-            }}
-            className={`flex min-h-32 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
-              dragging ? "border-primary bg-accent" : "border-muted-foreground/25 hover:bg-accent/50"
-            }`}
+    <main className="mx-auto w-full max-w-[800px] px-[10px] pb-16 pt-10">
+      <div className="card mb-[10px] px-5 py-[30px] text-center">
+        <h1 className="text-[32px] font-bold leading-[1.6em]">
+          PDF{" "}
+          <span
+            aria-hidden
+            className={`title-arrow ${arrowRolling ? "rolling" : ""}`}
+            onClick={() => setArrowRolling(true)}
+            onAnimationEnd={() => setArrowRolling(false)}
           >
-            <span className="text-sm font-medium">
-              {fileName ?? "Drop your PDF here, or click to browse"}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              Your file never leaves your browser
-            </span>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="application/pdf"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleFile(file);
-                e.target.value = "";
-              }}
-            />
-          </div>
+            ➡️
+          </span>{" "}
+          Preview
+        </h1>
+        <p className="font-light mt-1 text-[17px]">
+          Turn any PDF into a pretty preview image
+        </p>
+      </div>
 
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <div className="h-px flex-1 bg-border" />
-            or
-            <div className="h-px flex-1 bg-border" />
+      <div
+        role="radiogroup"
+        aria-label="Layout"
+        className="mb-[10px] grid grid-cols-3 gap-[10px] max-[600px]:grid-cols-1"
+      >
+        {MODES.map((m) => (
+          <div
+            key={m.value}
+            role="radio"
+            aria-checked={mode === m.value}
+            tabIndex={0}
+            onClick={() => selectMode(m.value)}
+            onKeyDown={(e) => e.key === "Enter" && selectMode(m.value)}
+            className="card option-card lift px-4 pb-4 pt-5 text-center"
+          >
+            <div className="flex h-[46px] items-end justify-center pb-1">
+              <LayoutDiagram mode={m.value} />
+            </div>
+            <div className="mt-2 text-[18px] font-bold">{m.label}</div>
           </div>
+        ))}
+      </div>
 
-          <div className="flex gap-2">
-            <Input
-              placeholder="https://arxiv.org/pdf/…"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleUrl()}
-            />
-            <Button variant="secondary" onClick={handleUrl} disabled={busy || !url.trim()}>
-              Fetch
-            </Button>
+      <div className="card mb-[10px] px-5 py-[30px] text-center">
+        <div
+          className={`dropzone px-5 py-10 ${dragging ? "dragging" : ""}`}
+          role="button"
+          tabIndex={0}
+          onClick={() => fileInputRef.current?.click()}
+          onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragging(false);
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+          }}
+        >
+          <div className="page-emoji text-[40px]">📄</div>
+          <div className="mt-3 text-[18px] font-bold">
+            {fileName ?? "Drop your PDF here"}
           </div>
-        </CardContent>
-      </Card>
+          <div className="font-light mt-1 text-[15px]">
+            or click to browse — your file never leaves the browser
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/pdf"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFile(file);
+              e.target.value = "";
+            }}
+          />
+        </div>
 
-      {busy && (
-        <p className="text-center text-sm text-muted-foreground">Processing…</p>
-      )}
+        <div className="font-light my-4 text-[15px]">or paste a link</div>
+
+        <div className="mx-auto flex max-w-[440px] gap-[10px]">
+          <input
+            className="neal-input min-w-0 flex-1"
+            placeholder="https://arxiv.org/pdf/1706.03762"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleUrl()}
+          />
+          <button className="btn-cream" onClick={handleUrl} disabled={busy || !url.trim()}>
+            {busy ? "Fetching…" : "Fetch"}
+          </button>
+        </div>
+
+        {error && <p className="note-error mt-4 text-[15px]">{error}</p>}
+        {busy && <p className="font-light mt-4 text-[15px]">Rendering pages…</p>}
+      </div>
 
       {previewUrl && !busy && (
-        <Card>
-          <CardContent className="flex flex-col items-center gap-4 pt-6">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={previewUrl}
-              alt="Generated PDF preview"
-              className="max-h-[70vh] w-auto max-w-full"
-            />
-            <Button asChild>
-              <a href={previewUrl} download="pdf2preview.png">
-                Download image
-              </a>
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="card mb-[10px] px-5 pb-[40px] pt-[30px] text-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={previewUrl}
+            alt="Generated PDF preview"
+            className="mx-auto max-h-[65vh] w-auto max-w-full"
+          />
+          {note && <p className="font-light mt-3 text-[14px]">{note}</p>}
+          <div className="mt-6">
+            <a href={previewUrl} download="pdf2preview.png">
+              <button className="btn-green lift">Download image</button>
+            </a>
+          </div>
+        </div>
       )}
 
-      <footer className="mt-auto text-center text-xs text-muted-foreground">
-        By <a className="underline underline-offset-2" href="https://chuanenlin.com">David Chuan-En Lin</a>.
-        Code on <a className="underline underline-offset-2" href="https://github.com/chuanenlin/pdf2preview">GitHub</a>.
+      <footer className="font-light mt-8 text-center text-[15px]">
+        By{" "}
+        <a className="underline underline-offset-2" href="https://chuanenlin.com">
+          David Chuan-En Lin
+        </a>
+        . Code on{" "}
+        <a
+          className="underline underline-offset-2"
+          href="https://github.com/chuanenlin/pdf2preview"
+        >
+          GitHub
+        </a>
+        .
       </footer>
-      <Toaster />
     </main>
   );
 }
