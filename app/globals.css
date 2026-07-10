@@ -109,14 +109,29 @@ body {
   outline: none;
 }
 
-/* Layout option cards: selected gets the accent, transparent border
-   otherwise so nothing shifts */
-.option-card {
-  border: 2px solid transparent;
+/* Segmented layout chips (studio toolbar) */
+.chip {
+  align-items: center;
+  background: rgb(255, 255, 255);
+  border: 1px solid rgb(200, 200, 200);
+  border-radius: 5px;
+  color: rgb(51, 51, 51);
   cursor: pointer;
+  display: inline-flex;
+  font-size: 15px;
+  font-weight: 700;
+  gap: 8px;
+  padding: 7px 12px;
+  transition: border-color 0.15s, background-color 0.15s;
 }
-.option-card[aria-checked="true"] {
+.chip[aria-checked="true"] {
+  background: rgb(227, 255, 227);
   border-color: rgb(5, 196, 107);
+}
+@media (hover: hover) {
+  .chip:not([aria-checked="true"]):hover {
+    border-color: rgb(51, 51, 51);
+  }
 }
 
 /* Little page glyphs inside the layout diagrams */
@@ -127,6 +142,50 @@ body {
   box-shadow: rgba(0, 0, 0, 0.18) 1px 2px 2px 0px;
   height: 34px;
   width: 26px;
+}
+.mini-page.sm {
+  height: 19px;
+  width: 15px;
+}
+
+/* Round close/reset button */
+.icon-btn {
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: rgb(51, 51, 51);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 15px;
+  height: 28px;
+  justify-content: center;
+  transition: background-color 0.15s;
+  width: 28px;
+}
+@media (hover: hover) {
+  .icon-btn:hover {
+    background: rgb(241, 242, 246);
+  }
+}
+
+/* Whole-window drop target overlay (studio: drop to replace) */
+.drop-overlay {
+  align-items: center;
+  background: rgba(241, 242, 246, 0.85);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  z-index: 50;
+}
+.drop-overlay-inner {
+  background: rgb(255, 255, 255);
+  border: 3px dashed rgb(5, 196, 107);
+  border-radius: 10px;
+  font-size: 24px;
+  font-weight: 700;
+  padding: 40px 60px;
 }
 
 /* Dropzone: dashed inner border, page emoji tilts on dragover */
