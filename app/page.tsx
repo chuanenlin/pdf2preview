@@ -334,15 +334,16 @@ export default function Home() {
         </>
       )}
 
-      <footer className="font-light mt-auto pt-6 text-center text-[15px]">
-        By{" "}
-        <a className="underline underline-offset-2" href="https://chuanenlin.com">
-          David Chuan-En Lin
+      <footer className="font-light mt-auto pt-6 text-center text-[13px] text-neutral-500">
+        Made by{" "}
+        <a className="underline decoration-dotted underline-offset-4 hover:decoration-solid" href="https://dlin.org/" target="_blank" rel="noopener noreferrer">
+          David
         </a>
         . Code on{" "}
         <a
           className="underline underline-offset-2"
           href="https://github.com/chuanenlin/pdf2preview"
+          target="_blank" rel="noopener noreferrer"
         >
           GitHub
         </a>
